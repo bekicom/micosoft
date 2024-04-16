@@ -185,6 +185,7 @@ export default function CreateProduct() {
                   <Input 
                     placeholder="Narxi" 
                     mt={3} 
+                    type="number"
                     value={formData.price} // Bind price value to input value
                     onChange={(e) => setFormData({ ...formData, price: e.target.value })} // Update price state onChange
                   />
