@@ -1,4 +1,4 @@
-import React, {  useState } from "react";
+import React, { useState } from "react";
 import { Button, useDisclosure } from "@chakra-ui/react";
 import {
   Modal,
@@ -13,11 +13,16 @@ import axios from "axios";
 
 export default function CreateProduct() {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const [category, setCategory] = useState("");
-  const [product, setProduct] = useState("");
-  const [storageType, setStorageType] = useState("");
-  const [storageSize, setStorageSize] = useState("");
-  const [screenSize, setScreenSize] = useState(""); // State for storing screen size
+  const [formData, setFormData] = useState({
+    category: "",
+    brand: "",
+    processor: "",
+    avlod: "",
+    storageType: "",
+    storageSize: "",
+    screenSize: "",
+    price: "",
+  });
 
   const categories = ["Noutbok", "Option 2", "Option 3"];
   const noutbookBrands = [
@@ -34,28 +39,31 @@ export default function CreateProduct() {
   const screenSizes = ["13.3", "14", "15.6", "16"];
 
   const handleCategoryChange = (e) => {
-    setCategory(e.target.value);
-    setProduct(""); 
-    setStorageType(""); 
-    setScreenSize(""); 
+    setFormData({
+      ...formData,
+      category: e.target.value,
+      brand: "",
+      processor: "",
+      avlod: "",
+      storageType: "",
+      storageSize: "",
+      screenSize: "",
+      price: "",
+    });
   };
 
   const handleStorageTypeChange = (e) => {
-    setStorageType(e.target.value);
-    setStorageSize(""); 
+    setFormData({
+      ...formData,
+      storageType: e.target.value,
+      storageSize: "",
+    });
   };
 
   const handleSave = () => {
-    const productData = {
-      category: category,
-      product: product,
-      storageType: storageType,
-      storageSize: storageSize,
-      screenSize: screenSize
-    };
-    onClose()
+    onClose();
     
-    axios.post("https://61fcfec8f62e220017ce4280.mockapi.io/kiyim-kechak/qishkiKiyimlar", productData)
+    axios.post("http://localhost:5000/api/user/add", formData)
       .then(response => {
         console.log("Ma'lumotlar yuborildi:", response.data);
       })
@@ -74,96 +82,116 @@ export default function CreateProduct() {
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent>
-          <ModalBody>
-            <Select
-              placeholder="Katigoryani tanlang"
-              mt={3}
-              value={category}
-              onChange={handleCategoryChange}
-            >
-              {categories.map((category, index) => (
-                <option key={index} value={category}>
-                  {category}
-                </option>
-              ))}
-            </Select>
-            {category === "Noutbok" && (
-              <>
-                <Select placeholder="Markani tanlang" mt={3}>
-                  {noutbookBrands.map((brand, index) => (
-                    <option key={index} value={brand}>
-                      {brand}
-                    </option>
-                  ))}
-                </Select>
-                <Select placeholder="Protsesori" mt={3}>
-                  {intelcore.map((core, index) => (
-                    <option key={index} value={core}>
-                      {core}
-                    </option>
-                  ))}
-                </Select>
-                <Select placeholder="Avlodi" mt={3}>
-                  {avlodi.map((avlod, index) => (
-                    <option key={index} value={avlod}>
-                      {avlod}
-                    </option>
-                  ))}
-                </Select>
-                <Select
-                  placeholder="Xotira Turini Tanlang"
-                  mt={3}
-                  value={storageType}
-                  onChange={handleStorageTypeChange}
-                >
-                  <option value="SSD">SSD</option>
-                  <option value="HDD">HDD</option>
-                </Select>
-                {storageType === "SSD" && (
-                  <Select
-                    placeholder="Xotira O'lchamini Tanlang"
-                    mt={3}
-                    value={storageSize}
-                    onChange={(e) => setStorageSize(e.target.value)}
+            <ModalBody>
+              <Select
+                placeholder="Katigoryani tanlang"
+                mt={3}
+                value={formData.category}
+                onChange={handleCategoryChange}
+              >
+                {categories.map((category, index) => (
+                  <option key={index} value={category}>
+                    {category}
+                  </option>
+                ))}
+              </Select>
+              {formData.category === "Noutbok" && (
+                <>
+                  <Select 
+                    placeholder="Markani tanlang" 
+                    mt={3} 
+                    value={formData.brand} 
+                    onChange={(e) => setFormData({ ...formData, brand: e.target.value })}
                   >
-                    {ssdSizes.map((size, index) => (
-                      <option key={index} value={size}>
-                        {size}
+                    {noutbookBrands.map((brand, index) => (
+                      <option key={index} value={brand}>
+                        {brand}
                       </option>
                     ))}
                   </Select>
-                )}
-                {storageType === "HDD" && (
-                  <Select
-                    placeholder="Xotira O'lchamini Tanlang"
-                    mt={3}
-                    value={storageSize}
-                    onChange={(e) => setStorageSize(e.target.value)}
+                  <Select 
+                    placeholder="Protsesori" 
+                    mt={3} 
+                    value={formData.processor} 
+                    onChange={(e) => setFormData({ ...formData, processor: e.target.value })}
                   >
-                    {hddSizes.map((size, index) => (
-                      <option key={index} value={size}>
-                        {size}
+                    {intelcore.map((core, index) => (
+                      <option key={index} value={core}>
+                        {core}
                       </option>
                     ))}
                   </Select>
-                )}
-                <Select
-                  placeholder="Ekran Razmerni Tanlang"
-                  mt={3}
-                  value={screenSize}
-                  onChange={(e) => setScreenSize(e.target.value)}
-                >
-                  {screenSizes.map((size, index) => (
-                    <option key={index} value={size}>
-                      {size}" 
-                    </option>
-                  ))}
-                </Select>
-              </>
-            )}
-            <Input placeholder="Narxi" mt={3} />
-          
-          </ModalBody>
+                  <Select 
+                    placeholder="Avlodi" 
+                    mt={3} 
+                    value={formData.avlod} 
+                    onChange={(e) => setFormData({ ...formData, avlod: e.target.value })}
+                  >
+                    {avlodi.map((avlod, index) => (
+                      <option key={index} value={avlod}>
+                        {avlod}
+                      </option>
+                    ))}
+                  </Select>
+                  <Select
+                    placeholder="Xotira Turini Tanlang"
+                    mt={3}
+                    value={formData.storageType}
+                    onChange={handleStorageTypeChange}
+                  >
+                    <option value="SSD">SSD</option>
+                    <option value="HDD">HDD</option>
+                  </Select>
+                  {formData.storageType === "SSD" && (
+                    <Select
+                      placeholder="Xotira O'lchamini Tanlang"
+                      mt={3}
+                      value={formData.storageSize}
+                      onChange={(e) => setFormData({ ...formData, storageSize: e.target.value })}
+                    >
+                      {ssdSizes.map((size, index) => (
+                        <option key={index} value={size}>
+                          {size}
+                        </option>
+                      ))}
+                    </Select>
+                  )}
+                  {formData.storageType === "HDD" && (
+                    <Select
+                      placeholder="Xotira O'lchamini Tanlang"
+                      mt={3}
+                      value={formData.storageSize}
+                      onChange={(e) => setFormData({ ...formData, storageSize: e.target.value })}
+                    >
+                      {hddSizes.map((size, index) => (
+                        <option key={index} value={size}>
+                          {size}
+                        </option>
+                      ))}
+                    </Select>
+                  )}
+                  <Select
+                    placeholder="Ekran Razmerni Tanlang"
+                    mt={3}
+                    value={formData.screenSize}
+                    onChange={(e) => setFormData({ ...formData, screenSize: e.target.value })}
+                  >
+                    {screenSizes.map((size, index) => (
+                      <option key={index} value={size}>
+                        {size}" 
+                      </option>
+                    ))}
+                  </Select>
+                  <Input 
+                    placeholder="Narxi" 
+                    mt={3} 
+                    value={formData.price} // Bind price value to input value
+                    onChange={(e) => setFormData({ ...formData, price: e.target.value })} // Update price state onChange
+                  />
+                </>
+              )}
+            
+            </ModalBody>
 
           <ModalFooter>
             <Button   colorScheme="blue" onClick={handleSave}>Saqlash</Button>
